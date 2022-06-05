@@ -56,7 +56,8 @@ class WordZone extends React.Component {
             selectedTile: {
                 row: 7,
                 column: 7
-            }
+            },
+            selectionDirection: 1
         }
     }
 
@@ -87,6 +88,23 @@ class WordZone extends React.Component {
         });
 
         return true;
+    }
+
+    removeCurrentTile() {
+        let newSt = this.shiftTile((this.state.selectionDirection + 2) % 4, this.state.selectedTile);
+        let currentTileCandidates = this.props.tiles.filter(
+            (tile) => tile.row == newSt.row && tile.column == newSt.column);
+
+        if(currentTileCandidates.length < 1)
+            return false;
+
+        this.props.tiles.pop(currentTileCandidates[0]);
+        this.setState({
+            selectedTile: newSt,
+            selectionDirection: this.state.selectionDirection
+        });
+
+        return currentTileCandidates[0].char;
     }
 
     renderTile(tile) {
@@ -124,9 +142,7 @@ class WordZone extends React.Component {
 
 class KeyboardKey extends React.Component {
     handleClick(label) {
-        console.log(`Key.handleClick(): props:`);
-        console.log(this.props);
-        if(this.props.count > 0)
+        if(this.props.count === undefined || this.props.count > 0)
             this.props.virtualKeyDown(label);
     }
 
@@ -164,15 +180,16 @@ class Keyboard extends React.Component {
     }
 
     render() {
-        console.log("Keyboard.render()");
-        console.log(this.props.tiles);
         let kbClass = "keyboard" + (this.props.isDumpMode ? " keyboard-dump" : "")
 
         return (
             <div className={kbClass}>
                 <div className="keyboard-row keyboard-row-r1">{this.state.keys.row1.map(this.renderKeyboardKey.bind(this))}</div>
                 <div className="keyboard-row keyboard-row-r2">{this.state.keys.row2.map(this.renderKeyboardKey.bind(this))}</div>
-                <div className="keyboard-row keyboard-row-r3">{this.state.keys.row3.map(this.renderKeyboardKey.bind(this))}</div>
+                <div className="keyboard-row keyboard-row-r3">
+                    {this.state.keys.row3.map(this.renderKeyboardKey.bind(this))}
+                    <KeyboardKey label="<=" virtualKeyDown={(key) => this.props.onBackspace()}></KeyboardKey>
+                    </div>
             </div>
         )
     }
@@ -229,7 +246,7 @@ class Game extends React.Component {
         let mixed = mixTileset(ukSet);
         let playerTiles = unmix(mixed.substring(0, 10)); 
         let stashTiles = unmix(mixed.substring(10));
-        
+
         return {
             tiles: [{row: 7, column: 7, char:'?', ui: false }],
             playerTiles: playerTiles,
@@ -272,6 +289,14 @@ class Game extends React.Component {
         }
     }
 
+    virtualBackspace() {
+        let tile = this._wordzone.removeCurrentTile();
+        if (tile) {
+            let newState = cloneUpdate(this.state, (s) => s.playerTiles[tile] = (s.playerTiles[tile] ?? 0) + 1);
+            this.setState(newState);
+        }
+    }
+
     render() {
         let canPeel = countTiles(this.state.playerTiles) === 0;
         let canDump = countTiles(this.state.stashTiles) >= 3;
@@ -282,7 +307,7 @@ class Game extends React.Component {
                 onPeel={() => this.peel()} onDump={() => this.toggleDumpMode()} />
             <WordZone ref={(c) => this._wordzone = c} tiles={this.state.tiles} />
             <Keyboard tiles={this.state.playerTiles} isDumpMode={this.state.dumpMode}
-                virtualKeyDown={(k) => this.virtualKeyPress(k)}/>
+                virtualKeyDown={(k) => this.virtualKeyPress(k)} onBackspace={() => this.virtualBackspace()}/>
         </div>
       );
     }
