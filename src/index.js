@@ -197,6 +197,15 @@ function mixTileset(tileset) {
     return mixed;
 }
 
+function unmix(mixed) {
+    var tileset = {};
+
+    for (var l of mixed)
+        tileset[l] = (tileset[l] ?? 0) + 1;
+
+    return tileset;
+}
+
 function mixPick(tileset) {
     return mixTileset(tileset)[0];
 }
@@ -205,24 +214,9 @@ function mixPick(tileset) {
 class Game extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            tiles: [
-                {row: 2, column: 2, char:'o', ui: false },
-                {row: 2, column: 3, char:'l', ui: false },
-                {row: 2, column: 4, char:'d', ui: false },
-                {row: 3, column: 3, char:'a', ui: false },
-                {row: 4, column: 3, char:'m', ui: false },
-                {row: 5, column: 3, char:'e', ui: false },
-                {row: 7, column: 7, char:'?', ui: false },
-            ],
-            playerTiles: {
-                'b': 1, 'h': 1
-            },
-            stashTiles: {
-                'b': 4, 'h': 2, 'p': 4, 'a': 1
-            },
-            dumpMode: false
-        };
+        let mixed = this.mix();
+        console.log(mixed);
+        this.state = mixed;
     }
 
     mix() {
@@ -233,8 +227,15 @@ class Game extends React.Component {
         }
 
         let mixed = mixTileset(ukSet);
-        let picked, reserve = (mixed.substring(0, 10), mixed.substring(10))
+        let playerTiles = unmix(mixed.substring(0, 10)); 
+        let stashTiles = unmix(mixed.substring(10));
         
+        return {
+            tiles: [{row: 7, column: 7, char:'?', ui: false }],
+            playerTiles: playerTiles,
+            stashTiles: stashTiles,
+            dumpMode: false
+        }
     }
 
     peel() {
