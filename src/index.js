@@ -31,8 +31,8 @@ class Header extends React.Component {
             <div className="header">
                 <h1>Annanagrams!</h1>
                 <div className="button-bar">
-                    <button className="button" onClick={() => this.props.onPeel()} disabled={peelDisabled}>P</button>
-                    <button className={dumpClassNames} onClick={() => this.props.onDump()} disabled={dumpDisabled}>D</button>
+                    <button className="button" onClick={() => this.props.onPeel()} disabled={peelDisabled}>🍌</button>
+                    <button className={dumpClassNames} onClick={() => this.props.onDump()} disabled={dumpDisabled}>🗑</button>
                 </div>
             </div>
         )
@@ -302,7 +302,7 @@ class Game extends React.Component {
         let canDump = countTiles(this.state.stashTiles) >= 3;
 
       return (
-        <div>
+        <div className="container">
             <Header canPeel={canPeel} canDump={canDump} isDumpMode={this.state.dumpMode}
                 onPeel={() => this.peel()} onDump={() => this.toggleDumpMode()} />
             <WordZone ref={(c) => this._wordzone = c} tiles={this.state.tiles} />
