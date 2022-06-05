@@ -54,8 +54,8 @@ class WordZone extends React.Component {
         super(props);
         this.state = {
             selectedTile: {
-                row: 7,
-                column: 7
+                row: 6,
+                column: 6
             },
             selectionDirection: 1
         }
@@ -124,10 +124,10 @@ class WordZone extends React.Component {
     render() {
         let st = this.state.selectedTile
         let uiTiles = st ? [
-            {row: st.row - 1, column: st.column,     char:'^', ui: true, direction: 0 },
-            {row: st.row,     column: st.column + 1, char:'>', ui: true, direction: 1 },
-            {row: st.row + 1, column: st.column,     char:'v', ui: true, direction: 2 },
-            {row: st.row,     column: st.column - 1, char:'<', ui: true, direction: 3 }
+            {row: st.row - 1, column: st.column,     char:'△', ui: true, direction: 0 },
+            {row: st.row,     column: st.column + 1, char:'▷', ui: true, direction: 1 },
+            {row: st.row + 1, column: st.column,     char:'▽', ui: true, direction: 2 },
+            {row: st.row,     column: st.column - 1, char:'◁', ui: true, direction: 3 }
         ] : []
 
         let allTiles = uiTiles.concat(this.props.tiles);
@@ -248,7 +248,7 @@ class Game extends React.Component {
         let stashTiles = unmix(mixed.substring(10));
 
         return {
-            tiles: [{row: 7, column: 7, char:'?', ui: false }],
+            tiles: [{row: 6, column: 6, char:'⚓', ui: true }],
             playerTiles: playerTiles,
             stashTiles: stashTiles,
             dumpMode: false
