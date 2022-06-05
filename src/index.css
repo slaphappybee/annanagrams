@@ -1,0 +1,71 @@
+body {
+    margin: 0px;
+}
+
+.header {
+    width: 100%;
+    border-bottom: 2px solid black;
+    background-color: rgb(240, 240, 255);
+}
+
+.header h1 {
+    margin: 10px 50px 10px 50px;
+}
+
+.keyboard {
+    margin-top: 10px;
+}
+
+.keyboard-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.keyboard-row :first-child {
+    margin-left: auto;
+}
+
+.keyboard-row :last-child {
+    margin-right: auto;
+}
+
+.keyboard-key {
+    display: flex;
+    flex-direction: column;
+    width: 7.6vw;
+    height: 4.5vh;
+    border: 2px solid black;
+    border-radius: 2vw;
+    text-transform: uppercase;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.3vw;
+    margin-left: 0.3vw;
+    margin-bottom: 5px;
+    background-color: rgb(255, 200, 200)
+}
+
+.word-zone {
+    display: grid;
+    grid-template-columns: 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw;
+    grid-template-rows: 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw;
+    max-width: 400px;
+}
+
+.tile {
+    display: flex;
+    width: 7.2vw;
+    height: 7.2vw;
+    border: 1px solid black;
+    border-radius: 5px;
+    text-transform: uppercase;
+    align-items: center;
+    justify-content: center;
+    margin: 0px;
+    background-color: rgb(255, 255, 220);
+}
+
+.tile-ui {
+    border-style: dotted;
+    background-color: rgb(255, 255, 250);
+}
