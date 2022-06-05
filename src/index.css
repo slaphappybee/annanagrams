@@ -12,6 +12,33 @@ body {
     margin: 10px 50px 10px 50px;
 }
 
+.button-bar {
+    height: 0px;
+    margin-left: 10px;
+    position: relative;
+}
+
+.button {
+    position: relative;
+    top: 5px;
+    margin: 5px 5px 5px 5px;
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    border: 2px solid black;
+    background-color: rgb(255, 220, 255);
+    font-size: 16pt;
+}
+
+.button.button-dump {
+    background-color: rgb(220, 255, 255);
+}
+
+.button:disabled {
+    background-color: rgb(255, 240, 255);
+    border: 2px dotted black;
+}
+
 .keyboard {
     margin-top: 10px;
 }
@@ -29,6 +56,14 @@ body {
     margin-right: auto;
 }
 
+.keyboard-dump .keyboard-key {
+    background-color: rgb(200, 255, 200);
+}
+
+.keyboard-dump .keyboard-key-disabled {
+    background-color: rgb(250, 255, 250);
+}
+
 .keyboard-key {
     display: flex;
     flex-direction: column;
@@ -42,10 +77,15 @@ body {
     margin-right: 0.3vw;
     margin-left: 0.3vw;
     margin-bottom: 5px;
-    background-color: rgb(255, 200, 200)
+    background-color: rgb(255, 200, 200);
+}
+
+.keyboard-key-disabled {
+    background-color: rgb(255, 240, 240);
 }
 
 .word-zone {
+    margin-top: 20px;
     display: grid;
     grid-template-columns: 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw;
     grid-template-rows: 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw;

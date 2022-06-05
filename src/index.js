@@ -2,11 +2,38 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 
+function strShuffle(subject) {
+    var a = subject.split(''), n = a.length;
+
+    for(var i = n - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i];
+        a[i] = a[j];
+        a[j] = tmp;
+    }
+
+    return a.join('')
+}
+
+function cloneUpdate(object, cb) {
+    var newObject = Object.assign({}, object);
+    cb(newObject);
+    return newObject;
+}
+
 class Header extends React.Component {
     render() {
+        let peelDisabled = !this.props.canPeel;
+        let dumpDisabled = !this.props.canDump;
+        let dumpClassNames = "button" + (this.props.isDumpMode ? " button-dump" : "")
+
         return (
             <div className="header">
                 <h1>Annanagrams!</h1>
+                <div className="button-bar">
+                    <button className="button" onClick={() => this.props.onPeel()} disabled={peelDisabled}>P</button>
+                    <button className={dumpClassNames} onClick={() => this.props.onDump()} disabled={dumpDisabled}>D</button>
+                </div>
             </div>
         )
     }
@@ -34,8 +61,6 @@ class WordZone extends React.Component {
     }
 
     selectTile(row, column, direction) {
-        console.log(`selectTile(${row}, ${column})`);
-
         this.setState({
             selectedTile: {
                 row: row,
@@ -52,7 +77,7 @@ class WordZone extends React.Component {
         return newTile
     }
 
-    keyDown(key) {
+    placeTile(key) {
         this.props.tiles.push({row: this.state.selectedTile.row,
             column: this.state.selectedTile.column, char: key, ui: false});
 
@@ -60,6 +85,8 @@ class WordZone extends React.Component {
             selectedTile: this.shiftTile(this.state.selectionDirection, this.state.selectedTile),
             selectionDirection: this.state.selectionDirection
         });
+
+        return true;
     }
 
     renderTile(tile) {
@@ -97,12 +124,19 @@ class WordZone extends React.Component {
 
 class KeyboardKey extends React.Component {
     handleClick(label) {
-        this.props.virtualKeyDown(label);
+        console.log(`Key.handleClick(): props:`);
+        console.log(this.props);
+        if(this.props.count > 0)
+            this.props.virtualKeyDown(label);
     }
 
     render() {
+        var className = "keyboard-key";
+        if(this.props.count === 0)
+            className = className + " keyboard-key-disabled";
+
         return (
-            <div className="keyboard-key" onClick={() => this.handleClick(this.props.label)}>{this.props.label}</div>
+            <div className={className} onClick={() => this.handleClick(this.props.label)}>{this.props.label}</div>
         )
     }
 }
@@ -120,44 +154,134 @@ class Keyboard extends React.Component {
     }
 
     onKeyDown(key) {
-        console.log(`key down: ${key}`);
         this.props.virtualKeyDown(key);
     }
 
+    renderKeyboardKey(key) {
+        let tileCount = this.props.tiles[key] ?? 0;
+
+        return (<KeyboardKey key={key} label={key} count={tileCount} virtualKeyDown={(key) => this.onKeyDown(key)}></KeyboardKey>)
+    }
+
     render() {
+        console.log("Keyboard.render()");
+        console.log(this.props.tiles);
+        let kbClass = "keyboard" + (this.props.isDumpMode ? " keyboard-dump" : "")
+
         return (
-            <div className="keyboard">
-                <div className="keyboard-row keyboard-row-r1">{this.state.keys.row1.map((key, i) => 
-                <KeyboardKey key={key} label={key} virtualKeyDown={(key) => this.onKeyDown(key)}></KeyboardKey>)}</div>
-                <div className="keyboard-row keyboard-row-r2">{this.state.keys.row2.map((key, i) => 
-                <KeyboardKey key={key} label={key} virtualKeyDown={(key) => this.onKeyDown(key)}></KeyboardKey>)}</div>
-                <div className="keyboard-row keyboard-row-r3">{this.state.keys.row3.map((key, i) => 
-                <KeyboardKey key={key} label={key} virtualKeyDown={(key) => this.onKeyDown(key)}></KeyboardKey>)}</div>
+            <div className={kbClass}>
+                <div className="keyboard-row keyboard-row-r1">{this.state.keys.row1.map(this.renderKeyboardKey.bind(this))}</div>
+                <div className="keyboard-row keyboard-row-r2">{this.state.keys.row2.map(this.renderKeyboardKey.bind(this))}</div>
+                <div className="keyboard-row keyboard-row-r3">{this.state.keys.row3.map(this.renderKeyboardKey.bind(this))}</div>
             </div>
         )
     }
 }
 
+function countTiles(tiles) {
+    var count = 0;
+    for(var key in tiles)
+        count += tiles[key];
+        return count;
+}
+
+function mixTileset(tileset) {
+    console.log("mixTileset");
+    console.log(tileset);
+    var mixed = ""
+    for(var l in tileset) {
+        mixed = mixed + l.repeat(tileset[l])
+    }
+
+    mixed = strShuffle(mixed);
+    return mixed;
+}
+
+function mixPick(tileset) {
+    return mixTileset(tileset)[0];
+}
+
+
 class Game extends React.Component {
     constructor(props) {
         super(props);
-        this.tiles = [
-            {row: 2, column: 2, char:'o', ui: false },
-            {row: 2, column: 3, char:'l', ui: false },
-            {row: 2, column: 4, char:'d', ui: false },
-            {row: 3, column: 3, char:'a', ui: false },
-            {row: 4, column: 3, char:'m', ui: false },
-            {row: 5, column: 3, char:'e', ui: false },
-            {row: 7, column: 7, char:'?', ui: false },
-        ]
+        this.state = {
+            tiles: [
+                {row: 2, column: 2, char:'o', ui: false },
+                {row: 2, column: 3, char:'l', ui: false },
+                {row: 2, column: 4, char:'d', ui: false },
+                {row: 3, column: 3, char:'a', ui: false },
+                {row: 4, column: 3, char:'m', ui: false },
+                {row: 5, column: 3, char:'e', ui: false },
+                {row: 7, column: 7, char:'?', ui: false },
+            ],
+            playerTiles: {
+                'b': 1, 'h': 1
+            },
+            stashTiles: {
+                'b': 4, 'h': 2, 'p': 4, 'a': 1
+            },
+            dumpMode: false
+        };
+    }
+
+    mix() {
+        let ukSet = {
+            'a': 13, 'b': 3, 'c': 3, 'd': 6, 'e': 18, 'f': 3, 'g': 4, 'h': 3, 'i': 12,
+            'j': 2, 'k': 2, 'l': 5, 'm': 3, 'n': 8, 'o': 11, 'p': 3, 'q': 2, 'r': 9,
+            's': 6, 't': 9, 'u': 6, 'v': 3, 'w': 3, 'x': 2, 'y': 3, 'z': 2
+        }
+
+        let mixed = mixTileset(ukSet);
+        let picked, reserve = (mixed.substring(0, 10), mixed.substring(10))
+        
+    }
+
+    peel() {
+        let newTile = mixPick(this.state.stashTiles);
+        let newState = cloneUpdate(this.state, (s) => {
+            s.playerTiles[newTile] = (s.playerTiles[newTile] ?? 0) + 1;
+            s.stashTiles[newTile] -= 1
+        });
+        this.setState(newState);
+    }
+
+    dump(key) {
+        this.setState(cloneUpdate(this.state, (s) => {
+            s.playerTiles[key] -= 1;
+        }));
+        this.peel();
+        this.peel();
+        this.peel();
+    }
+
+    toggleDumpMode() {
+        this.setState(cloneUpdate(this.state, (s) => s.dumpMode = !s.dumpMode));
+    }
+
+    virtualKeyPress(key) {
+        if(this.state.dumpMode) {
+            this.dump(key);
+            this.toggleDumpMode();
+        } else {
+            if(this._wordzone.placeTile(key)) {
+                let newState = cloneUpdate(this.state, (s) => s.playerTiles[key] -= 1);
+                this.setState(newState);
+            }
+        }
     }
 
     render() {
+        let canPeel = countTiles(this.state.playerTiles) === 0;
+        let canDump = countTiles(this.state.stashTiles) >= 3;
+
       return (
         <div>
-            <Header />
-            <WordZone ref={(c) => this._wordzone = c} tiles={this.tiles} />
-            <Keyboard virtualKeyDown={(k) => this._wordzone.keyDown(k)}/>
+            <Header canPeel={canPeel} canDump={canDump} isDumpMode={this.state.dumpMode}
+                onPeel={() => this.peel()} onDump={() => this.toggleDumpMode()} />
+            <WordZone ref={(c) => this._wordzone = c} tiles={this.state.tiles} />
+            <Keyboard tiles={this.state.playerTiles} isDumpMode={this.state.dumpMode}
+                virtualKeyDown={(k) => this.virtualKeyPress(k)}/>
         </div>
       );
     }
