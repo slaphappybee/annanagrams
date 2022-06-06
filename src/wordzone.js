@@ -30,6 +30,16 @@ export default class WordZone extends React.Component {
         });
     }
 
+    _getTile(row, column) {
+        let currentTileCandidates = this.props.tiles.filter(
+            (tile) => tile.row === row && tile.column === column);
+
+        if(currentTileCandidates.length < 1)
+            return null;
+        
+        return currentTileCandidates[0];
+    }
+
     shiftTile(direction, tile) {
         let newTile = Object.assign({}, tile);
         newTile.row += (direction === 0) ? -1 : (direction === 2) ? 1 : 0
@@ -38,28 +48,38 @@ export default class WordZone extends React.Component {
     }
 
     placeTile(key) {
-        this.props.tiles.push({row: this.state.selectedTile.row,
-            column: this.state.selectedTile.column, char: key, ui: false});
+        // Try cursor, then try position 1 step further
+        var tilePosition = this.state.selectedTile;
+        if(this._getTile(tilePosition.row, tilePosition.column) !== null)
+            tilePosition = this.shiftTile(this.props.direction, this.state.selectedTile)
+        
+        if(this._getTile(tilePosition.row, tilePosition.column) !== null)
+            return false;
+
+        this.props.tiles.push({row: tilePosition.row,
+            column: tilePosition.column, char: key, ui: false});
 
         this.setState({
-            selectedTile: this.shiftTile(this.props.direction, this.state.selectedTile)
+            selectedTile: this.shiftTile(this.props.direction, tilePosition)
         });
 
         return true;
     }
 
     removeCurrentTile() {
-        let newSt = this.shiftTile((this.props.direction + 2) % 4, this.state.selectedTile);
-        let currentTileCandidates = this.props.tiles.filter(
-            (tile) => tile.row === newSt.row && tile.column === newSt.column);
+        // Try cursor, then try position 1 step before
+        var tilePosition = this.state.selectedTile;
+        if(this._getTile(tilePosition.row, tilePosition.column) === null)
+            tilePosition = this.shiftTile((this.props.direction + 2) % 4, this.state.selectedTile)
 
-        if(currentTileCandidates.length < 1)
+        let currentTile = this._getTile(tilePosition.row, tilePosition.column);
+        if(currentTile === null)
             return false;
 
-        this.props.tiles.pop(currentTileCandidates[0]);
-        this.setState({selectedTile: newSt});
+        this.props.tiles.pop(currentTile);
+        this.setState({selectedTile: tilePosition});
 
-        return currentTileCandidates[0].char;
+        return currentTile.char;
     }
 
     renderTile(tile) {
@@ -86,10 +106,15 @@ export default class WordZone extends React.Component {
         ] : []
 
         let allTiles = uiTiles.concat(this.props.tiles);
+        let cursorStyle = {
+            gridRow: this.state.selectedTile.row,
+            gridColumn: this.state.selectedTile.column
+        }
 
         return (
             <div className="word-zone">
                 {allTiles.map(this.renderTile.bind(this))}
+                <div className="tile tile-cursor" style={cursorStyle} />
             </div>
         )
     }
