@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 
-class ToggleButtonProps {
+interface ToggleButtonProps {
     checked: boolean;
     onClick: Function;
     children: ReactNode;

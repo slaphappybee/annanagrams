@@ -1,6 +1,6 @@
 import React, { MouseEventHandler } from 'react';
 
-class TileProps {
+interface TileProps {
     className: string;
     style: any;
     onClick: MouseEventHandler;
@@ -17,17 +17,17 @@ class Tile extends React.Component<TileProps> {
     }
 }
 
-class WordZoneProps {
+interface WordZoneProps {
     tiles: Array<any>;
     direction: number;
 }
 
-class WordZoneState {
+interface WordZoneState {
     selectedTile: {row: number, column: number};
 }
 
 export default class WordZone extends React.Component<WordZoneProps, WordZoneState> {
-    constructor(props) {
+    constructor(props: WordZoneProps) {
         super(props);
         this.state = {
             selectedTile: {
@@ -37,7 +37,7 @@ export default class WordZone extends React.Component<WordZoneProps, WordZoneSta
         }
     }
 
-    selectTile(row, column, direction) {
+    selectTile(row: number, column: number, direction: {}) {
         this.setState({
             selectedTile: {
                 row: row,
@@ -46,7 +46,7 @@ export default class WordZone extends React.Component<WordZoneProps, WordZoneSta
         });
     }
 
-    _getTile(row, column) {
+    _getTile(row: number, column: number) {
         let currentTileCandidates = this.props.tiles.filter(
             (tile) => tile.row === row && tile.column === column);
 
@@ -56,14 +56,14 @@ export default class WordZone extends React.Component<WordZoneProps, WordZoneSta
         return currentTileCandidates[0];
     }
 
-    shiftTile(direction, tile) {
+    shiftTile(direction: number, tile: any) {
         let newTile = Object.assign({}, tile);
         newTile.row += (direction === 0) ? -1 : (direction === 2) ? 1 : 0
         newTile.column += (direction === 1) ? 1 : (direction === 3) ? -1 : 0
         return newTile
     }
 
-    placeTile(key) {
+    placeTile(key: string) {
         // Try cursor, then try position 1 step further
         var tilePosition = this.state.selectedTile;
         if(this._getTile(tilePosition.row, tilePosition.column) !== null)
@@ -99,7 +99,7 @@ export default class WordZone extends React.Component<WordZoneProps, WordZoneSta
         return currentTile.char;
     }
 
-    renderTile(tile) {
+    renderTile(tile: any) {
         let style = {
             gridRow: tile.row,
             gridColumn: tile.column

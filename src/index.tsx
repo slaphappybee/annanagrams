@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Header from './header.tsx';
-import WordZone from './wordzone.tsx';
-import Keyboard from './keyboard.tsx';
-import ButtonBar from './buttonbar.tsx';
+import Header from './header';
+import WordZone from './wordzone';
+import Keyboard from './keyboard';
+import ButtonBar from './buttonbar';
 
 import './index.css';
 
@@ -58,8 +58,17 @@ function mixPick(tileset) {
     return mixTileset(tileset)[0];
 }
 
+class GameState {
+    stashTiles: any;
+    playerTiles: any;
+    tiles: Array<{row: number, column: number, char: string}>;
+    boardDirection: number;
+    dumpMode: boolean;
+}
 
-class Game extends React.Component {
+class Game extends React.Component<{}, GameState> {
+    private _wordzone: WordZone;
+
     constructor(props) {
         super(props);
         let mixed = this.mix();
@@ -145,7 +154,7 @@ class Game extends React.Component {
                 onPeel={() => this.peel()} onDump={() => this.toggleDumpMode()} direction={this.state.boardDirection}
                 onSelectDirection={this.selectDirection.bind(this)} />
             <Keyboard tiles={this.state.playerTiles} isDumpMode={this.state.dumpMode}
-                virtualKeyDown={(k) => this.virtualKeyPress(k)} onBackspace={() => this.virtualBackspace()}/>
+                virtualKeyDown={(k: string) => this.virtualKeyPress(k)} onBackspace={() => this.virtualBackspace()}/>
         </div>
       );
     }
