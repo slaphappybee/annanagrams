@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import Header from './header.js';
 import WordZone from './wordzone.js';
 import Keyboard from './keyboard.js';
+import ButtonBar from './buttonbar.js';
+
 import './index.css';
 
 function strShuffle(subject) {
@@ -80,7 +82,8 @@ class Game extends React.Component {
             tiles: [{row: 6, column: 6, char:'⚓', ui: true }],
             playerTiles: playerTiles,
             stashTiles: stashTiles,
-            dumpMode: false
+            dumpMode: false,
+            boardDirection: 1
         }
     }
 
@@ -126,15 +129,21 @@ class Game extends React.Component {
         }
     }
 
+    selectDirection(direction) {
+        this.setState(cloneUpdate(this.state, (s) => s.boardDirection = direction));
+    }
+
     render() {
         let canPeel = countTiles(this.state.playerTiles) === 0;
         let canDump = countTiles(this.state.stashTiles) >= 3;
 
       return (
         <div className="container">
-            <Header canPeel={canPeel} canDump={canDump} isDumpMode={this.state.dumpMode}
-                onPeel={() => this.peel()} onDump={() => this.toggleDumpMode()} />
-            <WordZone ref={(c) => this._wordzone = c} tiles={this.state.tiles} />
+            <Header />
+            <WordZone ref={(c) => this._wordzone = c} tiles={this.state.tiles} direction={this.state.boardDirection} />
+            <ButtonBar canPeel={canPeel} canDump={canDump} isDumpMode={this.state.dumpMode}
+                onPeel={() => this.peel()} onDump={() => this.toggleDumpMode()} direction={this.state.boardDirection}
+                onSelectDirection={this.selectDirection.bind(this)} />
             <Keyboard tiles={this.state.playerTiles} isDumpMode={this.state.dumpMode}
                 virtualKeyDown={(k) => this.virtualKeyPress(k)} onBackspace={() => this.virtualBackspace()}/>
         </div>

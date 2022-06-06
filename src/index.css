@@ -19,13 +19,10 @@ body {
 }
 
 .button-bar {
-    height: 0px;
     margin-left: 10px;
-    position: relative;
 }
 
 .button {
-    position: relative;
     top: 5px;
     margin: 5px 5px 5px 5px;
     width: 36px;
@@ -34,6 +31,15 @@ body {
     border: 2px solid black;
     background-color: rgb(255, 220, 255);
     font-size: 14pt;
+}
+
+.button-checked {
+    background-color: rgb(255, 160, 255);
+}
+
+.button-group {
+    margin-left: 100px;
+    display: inline;
 }
 
 .button.button-dump {

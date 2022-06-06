@@ -17,8 +17,7 @@ export default class WordZone extends React.Component {
             selectedTile: {
                 row: 6,
                 column: 6
-            },
-            selectionDirection: 1
+            }
         }
     }
 
@@ -27,8 +26,7 @@ export default class WordZone extends React.Component {
             selectedTile: {
                 row: row,
                 column: column
-            },
-            selectionDirection: direction
+            }
         });
     }
 
@@ -44,15 +42,14 @@ export default class WordZone extends React.Component {
             column: this.state.selectedTile.column, char: key, ui: false});
 
         this.setState({
-            selectedTile: this.shiftTile(this.state.selectionDirection, this.state.selectedTile),
-            selectionDirection: this.state.selectionDirection
+            selectedTile: this.shiftTile(this.props.direction, this.state.selectedTile)
         });
 
         return true;
     }
 
     removeCurrentTile() {
-        let newSt = this.shiftTile((this.state.selectionDirection + 2) % 4, this.state.selectedTile);
+        let newSt = this.shiftTile((this.props.direction + 2) % 4, this.state.selectedTile);
         let currentTileCandidates = this.props.tiles.filter(
             (tile) => tile.row === newSt.row && tile.column === newSt.column);
 
@@ -60,10 +57,7 @@ export default class WordZone extends React.Component {
             return false;
 
         this.props.tiles.pop(currentTileCandidates[0]);
-        this.setState({
-            selectedTile: newSt,
-            selectionDirection: this.state.selectionDirection
-        });
+        this.setState({selectedTile: newSt});
 
         return currentTileCandidates[0].char;
     }
