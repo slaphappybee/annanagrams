@@ -1,6 +1,12 @@
 import React from 'react';
 
-class KeyboardKey extends React.Component {
+class KeyboardKeyProps {
+    count?: number;
+    virtualKeyDown: Function;
+    label: string;
+}
+
+class KeyboardKey extends React.Component<KeyboardKeyProps> {
     handleClick(label) {
         if(this.props.count === undefined || this.props.count > 0)
             this.props.virtualKeyDown(label);
@@ -17,7 +23,18 @@ class KeyboardKey extends React.Component {
     }
 }
 
-export default class Keyboard extends React.Component {
+class KeyboardProps {
+    virtualKeyDown: Function;
+    onBackspace: Function;
+    tiles: Array<any>;
+    isDumpMode: boolean;
+}
+
+class KeyboardState {
+    keys: {row1: Array<string>, row2: Array<string>, row3: Array<string>};
+}
+
+export default class Keyboard extends React.Component<KeyboardProps, KeyboardState> {
     constructor(props) {
         super(props);
         this.state = {

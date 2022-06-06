@@ -1,6 +1,13 @@
-import React from 'react';
+import React, { MouseEventHandler } from 'react';
 
-class Tile extends React.Component {
+class TileProps {
+    className: string;
+    style: any;
+    onClick: MouseEventHandler;
+    char: string;
+}
+
+class Tile extends React.Component<TileProps> {
     render() {
         let className = this.props.className + " tile";
         return (
@@ -10,7 +17,16 @@ class Tile extends React.Component {
     }
 }
 
-export default class WordZone extends React.Component {
+class WordZoneProps {
+    tiles: Array<any>;
+    direction: number;
+}
+
+class WordZoneState {
+    selectedTile: {row: number, column: number};
+}
+
+export default class WordZone extends React.Component<WordZoneProps, WordZoneState> {
     constructor(props) {
         super(props);
         this.state = {
@@ -76,7 +92,8 @@ export default class WordZone extends React.Component {
         if(currentTile === null)
             return false;
 
-        this.props.tiles.pop(currentTile);
+        // TODO bug
+        this.props.tiles.pop();
         this.setState({selectedTile: tilePosition});
 
         return currentTile.char;

@@ -1,6 +1,12 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
-class ToggleButton extends React.Component {
+class ToggleButtonProps {
+    checked: boolean;
+    onClick: Function;
+    children: ReactNode;
+}
+
+class ToggleButton extends React.Component<ToggleButtonProps> {
     render() {
         let className = "button" + (this.props.checked ? " button-checked" : "");
 
@@ -11,11 +17,18 @@ class ToggleButton extends React.Component {
     }
 }
 
-export default class ButtonBar extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+class ButtonBarProps {
+    canPeel: boolean;
+    canDump: boolean;
+    isDumpMode: boolean;
+    direction: number;
 
+    onPeel: Function;
+    onDump: Function;
+    onSelectDirection: Function;
+}
+
+export default class ButtonBar extends React.Component<ButtonBarProps> {
     render() {
         let peelDisabled = !this.props.canPeel;
         let dumpDisabled = !this.props.canDump;

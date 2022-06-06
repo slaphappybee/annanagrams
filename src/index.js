@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Header from './header.js';
-import WordZone from './wordzone.js';
-import Keyboard from './keyboard.js';
-import ButtonBar from './buttonbar.js';
+import Header from './header.tsx';
+import WordZone from './wordzone.tsx';
+import Keyboard from './keyboard.tsx';
+import ButtonBar from './buttonbar.tsx';
 
 import './index.css';
 
