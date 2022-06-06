@@ -1,13 +1,15 @@
 import React, { MouseEventHandler } from 'react';
+import { Tile, Position } from './model';
 
-interface TileProps {
+
+interface ZoneTileProps {
     className: string;
     style: any;
     onClick: MouseEventHandler;
     char: string;
 }
 
-class Tile extends React.Component<TileProps> {
+class ZoneTile extends React.Component<ZoneTileProps> {
     render() {
         let className = this.props.className + " tile";
         return (
@@ -18,12 +20,12 @@ class Tile extends React.Component<TileProps> {
 }
 
 interface WordZoneProps {
-    tiles: Array<any>;
+    tiles: Array<Tile>;
     direction: number;
 }
 
 interface WordZoneState {
-    selectedTile: {row: number, column: number};
+    selectedTile: Position;
 }
 
 export default class WordZone extends React.Component<WordZoneProps, WordZoneState> {
@@ -33,22 +35,19 @@ export default class WordZone extends React.Component<WordZoneProps, WordZoneSta
             selectedTile: {
                 row: 6,
                 column: 6
-            }
+            } as Position
         }
     }
 
-    selectTile(row: number, column: number, direction: {}) {
+    selectTile(position: Position) {
         this.setState({
-            selectedTile: {
-                row: row,
-                column: column
-            }
+            selectedTile: position
         });
     }
 
     _getTile(row: number, column: number) {
         let currentTileCandidates = this.props.tiles.filter(
-            (tile) => tile.row === row && tile.column === column);
+            (tile) => tile.position.row === row && tile.position.column === column);
 
         if(currentTileCandidates.length < 1)
             return null;
@@ -72,8 +71,8 @@ export default class WordZone extends React.Component<WordZoneProps, WordZoneSta
         if(this._getTile(tilePosition.row, tilePosition.column) !== null)
             return false;
 
-        this.props.tiles.push({row: tilePosition.row,
-            column: tilePosition.column, char: key, ui: false});
+        this.props.tiles.push({position: {row: tilePosition.row,
+            column: tilePosition.column}, label: key, ui: false});
 
         this.setState({
             selectedTile: this.shiftTile(this.props.direction, tilePosition)
@@ -82,7 +81,7 @@ export default class WordZone extends React.Component<WordZoneProps, WordZoneSta
         return true;
     }
 
-    removeCurrentTile() {
+    removeCurrentTile(): string | undefined {
         // Try cursor, then try position 1 step before
         var tilePosition = this.state.selectedTile;
         if(this._getTile(tilePosition.row, tilePosition.column) === null)
@@ -90,36 +89,35 @@ export default class WordZone extends React.Component<WordZoneProps, WordZoneSta
 
         let currentTile = this._getTile(tilePosition.row, tilePosition.column);
         if(currentTile === null)
-            return false;
+            return undefined;
 
         // TODO bug
         this.props.tiles.pop();
         this.setState({selectedTile: tilePosition});
 
-        return currentTile.char;
+        return currentTile.label;
     }
 
-    renderTile(tile: any) {
+    renderTile(tile: Tile) {
         let style = {
-            gridRow: tile.row,
-            gridColumn: tile.column
+            gridRow: tile.position.row,
+            gridColumn: tile.position.column
         }
 
         let className = tile.ui ? 'tile-ui' : 'tile-word';
-        let key = `${tile.row}-${tile.column}-${tile.char}`
-        let uiDirection = tile.ui ? tile.direction : 1;
+        let key = `${tile.position.row}-${tile.position.column}-${tile.label}`
 
-        return (<Tile char={tile.char} style={style} className={className} 
-            key={key} onClick={() => this.selectTile(tile.row, tile.column, uiDirection)} />)
+        return (<ZoneTile char={tile.label} style={style} className={className} 
+            key={key} onClick={() => this.selectTile(tile.position)} />)
     }
 
     render() {
         let st = this.state.selectedTile
         let uiTiles = st ? [
-            {row: st.row - 1, column: st.column,     char:'△', ui: true, direction: 0 },
-            {row: st.row,     column: st.column + 1, char:'▷', ui: true, direction: 1 },
-            {row: st.row + 1, column: st.column,     char:'▽', ui: true, direction: 2 },
-            {row: st.row,     column: st.column - 1, char:'◁', ui: true, direction: 3 }
+            {position: {row: st.row - 1, column: st.column},     label:'△', ui: true } as Tile,
+            {position: {row: st.row,     column: st.column + 1}, label:'▷', ui: true } as Tile,
+            {position: {row: st.row + 1, column: st.column},     label:'▽', ui: true } as Tile,
+            {position: {row: st.row,     column: st.column - 1}, label:'◁', ui: true } as Tile
         ] : []
 
         let allTiles = uiTiles.concat(this.props.tiles);

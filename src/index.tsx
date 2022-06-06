@@ -4,6 +4,7 @@ import Header from './header';
 import WordZone from './wordzone';
 import Keyboard from './keyboard';
 import ButtonBar from './buttonbar';
+import { Tile, Position } from './model';
 
 import './index.css';
 
@@ -61,7 +62,7 @@ function mixPick(tileset) {
 class GameState {
     stashTiles: any;
     playerTiles: any;
-    tiles: Array<{row: number, column: number, char: string}>;
+    tiles: Array<Tile>;
     boardDirection: number;
     dumpMode: boolean;
 }
@@ -88,7 +89,7 @@ class Game extends React.Component<{}, GameState> {
         let stashTiles = unmix(mixed.substring(10));
 
         return {
-            tiles: [{row: 6, column: 6, char:'⚓', ui: true }],
+            tiles: [{position: {row: 6, column: 6}, label:'⚓', ui: true }],
             playerTiles: playerTiles,
             stashTiles: stashTiles,
             dumpMode: false,
