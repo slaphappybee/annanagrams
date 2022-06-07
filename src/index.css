@@ -15,7 +15,7 @@ body {
 }
 
 .header h1 {
-    margin: 10px 50px 10px 50px;
+    margin: 10px 10px 10px 10px;
 }
 
 .button-bar {
@@ -38,7 +38,7 @@ body {
 }
 
 .button-group {
-    margin-left: 100px;
+    margin-left: 70px;
     display: inline;
 }
 
@@ -122,8 +122,8 @@ body {
     flex-grow: 1;
     margin-top: 20px;
     display: grid;
-    grid-template-columns: 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw;
-    grid-template-rows: 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw;
+    grid-template-columns: 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw;
+    grid-template-rows: 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw 8vw;
     max-width: 400px;
 }
 
