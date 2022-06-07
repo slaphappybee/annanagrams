@@ -87,7 +87,7 @@ class Game extends React.Component<{}, GameState> {
         let stashTiles = unmix(mixed.substring(10));
 
         return Object.assign(new GameState(), {
-            tiles: [{position: {row: 6, column: 6}, label:'⚓', ui: true }],
+            tiles: [],
             playerTiles: playerTiles,
             stashTiles: stashTiles,
             cursor: {row: 7, column: 7} as Position,

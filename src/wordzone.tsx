@@ -47,6 +47,7 @@ export default class WordZone extends React.Component<WordZoneProps> {
     render() {
         let st = this.props.cursor
         let uiTiles = st ? [
+            {position: {row: 7, column: 7}, label:'⚓', ui: true } as Tile,
             {position: {row: st.row - 1, column: st.column},     label:'△', ui: true } as Tile,
             {position: {row: st.row,     column: st.column + 1}, label:'▷', ui: true } as Tile,
             {position: {row: st.row + 1, column: st.column},     label:'▽', ui: true } as Tile,
