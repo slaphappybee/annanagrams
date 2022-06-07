@@ -21,7 +21,7 @@ function strShuffle(subject) {
     return a.join('')
 }
 
-function cloneUpdate(object, cb) {
+function cloneUpdate<T>(object: Readonly<T>, cb: (object: T) => void) {
     var newObject = Object.assign({}, object);
     cb(newObject);
     return newObject;
@@ -35,8 +35,6 @@ function countTiles(tiles) {
 }
 
 function mixTileset(tileset) {
-    console.log("mixTileset");
-    console.log(tileset);
     var mixed = ""
     for(var l in tileset) {
         mixed = mixed + l.repeat(tileset[l])
@@ -60,9 +58,10 @@ function mixPick(tileset) {
 }
 
 class GameState {
-    stashTiles: any;
-    playerTiles: any;
+    stashTiles: Record<string, number>;
+    playerTiles: Record<string, number>;
     tiles: Array<Tile>;
+    cursor: Position;
     boardDirection: number;
     dumpMode: boolean;
 }
@@ -73,7 +72,6 @@ class Game extends React.Component<{}, GameState> {
     constructor(props) {
         super(props);
         let mixed = this.mix();
-        console.log(mixed);
         this.state = mixed;
     }
 
@@ -88,13 +86,14 @@ class Game extends React.Component<{}, GameState> {
         let playerTiles = unmix(mixed.substring(0, 10)); 
         let stashTiles = unmix(mixed.substring(10));
 
-        return {
+        return Object.assign(new GameState(), {
             tiles: [{position: {row: 6, column: 6}, label:'⚓', ui: true }],
             playerTiles: playerTiles,
             stashTiles: stashTiles,
+            cursor: {row: 7, column: 7} as Position,
             dumpMode: false,
             boardDirection: 1
-        }
+        } as GameState);
     }
 
     peel() {
@@ -124,23 +123,69 @@ class Game extends React.Component<{}, GameState> {
             this.dump(key);
             this.toggleDumpMode();
         } else {
-            if(this._wordzone.placeTile(key)) {
-                let newState = cloneUpdate(this.state, (s) => s.playerTiles[key] -= 1);
-                this.setState(newState);
-            }
+            this.setState(this.statePlaceTile(key));
         }
     }
 
     virtualBackspace() {
-        let tile = this._wordzone.removeCurrentTile();
-        if (tile) {
-            let newState = cloneUpdate(this.state, (s) => s.playerTiles[tile] = (s.playerTiles[tile] ?? 0) + 1);
-            this.setState(newState);
-        }
+        this.setState(this.stateRemoveCurrentTile());
     }
 
     selectDirection(direction) {
         this.setState(cloneUpdate(this.state, (s) => s.boardDirection = direction));
+    }
+
+    _stateGetTileAt(position: Position): Tile | undefined {
+        let currentTileCandidates = this.state.tiles.filter(
+            (tile) => tile.position.row === position.row && tile.position.column === position.column);
+
+        if(currentTileCandidates.length < 1)
+            return undefined;
+        
+        return currentTileCandidates[0];
+    }
+
+    _shiftPosition(direction: number, position: Position): Position {
+        let newTile = Object.assign({}, position);
+        newTile.row += (direction === 0) ? -1 : (direction === 2) ? 1 : 0
+        newTile.column += (direction === 1) ? 1 : (direction === 3) ? -1 : 0
+        return newTile
+    }
+
+    statePlaceTile(label: string): any {
+        // Try cursor, then try position 1 step further
+        var tilePosition = this.state.cursor;
+        if(this._stateGetTileAt(tilePosition) !== undefined)
+            tilePosition = this._shiftPosition(this.state.boardDirection, this.state.cursor)
+        
+        if(this._stateGetTileAt(tilePosition) !== undefined)
+            return {};
+
+        let newTiles = this.state.tiles.concat([{position: {row: tilePosition.row,
+            column: tilePosition.column}, label: label, ui: false} as Tile]);
+        let newPlayerTiles = cloneUpdate(this.state.playerTiles, (s) => s[label] -= 1);
+
+        return {tiles: newTiles, cursor: tilePosition, playerTiles: newPlayerTiles};
+    }
+
+    stateRemoveCurrentTile(): any {
+        // Try cursor, then try position 1 step before
+        var tilePosition = this.state.cursor;
+        if(this._stateGetTileAt(tilePosition) === undefined)
+            tilePosition = this._shiftPosition((this.state.boardDirection + 2) % 4, this.state.cursor)
+
+        let currentTile = this._stateGetTileAt(tilePosition);
+        if(currentTile === undefined)
+            return undefined;
+
+        let newTiles = this.state.tiles.filter((t) => t !== currentTile);
+        let newPlayerTiles = cloneUpdate(this.state.playerTiles, (s) => s[currentTile.label] = (s[currentTile.label] ?? 0) + 1);
+
+        return {tiles: newTiles, cursor: tilePosition, playerTiles: newPlayerTiles};
+    }
+
+    onCursorChanged(position: Position) {
+        this.setState({cursor: position});
     }
 
     render() {
@@ -150,7 +195,7 @@ class Game extends React.Component<{}, GameState> {
       return (
         <div className="container">
             <Header />
-            <WordZone ref={(c) => this._wordzone = c} tiles={this.state.tiles} direction={this.state.boardDirection} />
+            <WordZone ref={(c) => this._wordzone = c} tiles={this.state.tiles} cursor={this.state.cursor} onCursorChanged={this.onCursorChanged.bind(this)} />
             <ButtonBar canPeel={canPeel} canDump={canDump} isDumpMode={this.state.dumpMode}
                 onPeel={() => this.peel()} onDump={() => this.toggleDumpMode()} direction={this.state.boardDirection}
                 onSelectDirection={this.selectDirection.bind(this)} />
