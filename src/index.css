@@ -18,6 +18,13 @@ body {
     margin: 10px 10px 10px 10px;
 }
 
+.header-stats {
+    font-size: 16pt;
+    margin-top: 0px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+}
+
 .button-bar {
     margin-left: 10px;
 }

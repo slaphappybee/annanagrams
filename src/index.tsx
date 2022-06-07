@@ -108,6 +108,7 @@ class Game extends React.Component<{}, GameState> {
     dump(key) {
         this.setState(cloneUpdate(this.state, (s) => {
             s.playerTiles[key] -= 1;
+            s.stashTiles[key] += 1;
         }));
         this.peel();
         this.peel();
@@ -143,6 +144,13 @@ class Game extends React.Component<{}, GameState> {
             return undefined;
         
         return currentTileCandidates[0];
+    }
+
+    _countTiles(tileSet: any): number {
+        var count = 0;
+        for(var key in tileSet)
+            count += tileSet[key];
+        return count;
     }
 
     _shiftPosition(direction: number, position: Position): Position {
@@ -192,9 +200,13 @@ class Game extends React.Component<{}, GameState> {
         let canPeel = countTiles(this.state.playerTiles) === 0;
         let canDump = countTiles(this.state.stashTiles) >= 3;
 
+        let playerTC = this._countTiles(this.state.playerTiles);
+        let stashTC = this._countTiles(this.state.stashTiles);
+        let boardTC = this.state.tiles.length;
+
       return (
         <div className="container">
-            <Header />
+            <Header playerTileCount={playerTC} boardTileCount={boardTC} stashTileCount={stashTC} />
             <WordZone ref={(c) => this._wordzone = c} tiles={this.state.tiles} cursor={this.state.cursor} onCursorChanged={this.onCursorChanged.bind(this)} />
             <ButtonBar canPeel={canPeel} canDump={canDump} isDumpMode={this.state.dumpMode}
                 onPeel={() => this.peel()} onDump={() => this.toggleDumpMode()} direction={this.state.boardDirection}
