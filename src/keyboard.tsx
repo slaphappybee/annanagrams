@@ -17,8 +17,13 @@ class KeyboardKey extends React.Component<KeyboardKeyProps> {
         if(this.props.count === 0)
             className = className + " keyboard-key-disabled";
 
+        let countStyle = (this.props.count >= 2) ? {} : {display: 'none'};
+
         return (
-            <div className={className} onClick={() => this.handleClick(this.props.label)}>{this.props.label}</div>
+            <div className={className} onClick={() => this.handleClick(this.props.label)}>
+                <div className="key-label">{this.props.label}</div>
+                <div className="key-count-wrapper" style={countStyle}><div className="key-count">{this.props.count}</div></div>
+            </div>
         )
     }
 }

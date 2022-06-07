@@ -61,11 +61,11 @@ body {
     flex-direction: row;
 }
 
-.keyboard-row :first-child {
+.keyboard-row>:first-child {
     margin-left: auto;
 }
 
-.keyboard-row :last-child {
+.keyboard-row>:last-child {
     margin-right: auto;
 }
 
@@ -95,6 +95,27 @@ body {
 
 .keyboard-key-disabled {
     background-color: rgb(255, 240, 240);
+}
+
+.key-count-wrapper {
+    position: relative;
+    height: 0px;
+}
+
+.key-label {
+    margin-bottom: 7px;
+}
+
+.key-count {
+    margin-top: -4px;
+    border: 1px solid black;
+    background-color: white;
+    border-radius: 100%;
+    width: 6px;
+    height: 16px;
+    font-size: 8pt;
+    padding-left: 3px;
+    padding-right: 2px;
 }
 
 .word-zone {
